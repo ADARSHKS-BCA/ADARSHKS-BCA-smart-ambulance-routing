@@ -1,104 +1,106 @@
 # Smart Ambulance Routing — Emergency Coordination App
 
-A Flutter mobile application for real-time emergency ambulance coordination. Built with a premium UI design system derived from Google Stitch, this app provides a seamless voice-driven workflow for paramedics to coordinate patient transport to nearby hospitals.
-
-> **⚠️ UI-Only Implementation** — This is a frontend prototype with static/dummy data. No backend, APIs, or real-time logic included.
+A Flutter mobile application for real-time emergency ambulance coordination with multilingual voice translation. Built with a premium UI design system derived from Google Stitch, this app provides a seamless voice-driven workflow for paramedics to coordinate patient transport to nearby hospitals.
 
 ---
 
-## 📱 Screenshots & Flow
+## Features
+
+### Emergency Workflow (UI Prototype)
+- **Start Emergency** — Pulsating red button with unit status
+- **Voice Input** — Animated mic with ripple effects and transcription
+- **Patient Summary** — AI-generated assessment with vitals grid
+- **Hospital Selection** — Sorted by ETA with bed availability
+- **Navigation** — Turn-by-turn instructions with ETA overlay
+- **Live Tracking** — Real-time countdown and trip progress
+
+### Voice Translation (Full Stack)
+- **Record audio** in any language using device microphone
+- **Transcribe** using OpenAI Whisper (`gpt-4o-transcribe`)
+- **Translate** to English using GPT-4o-mini
+- **Display** original + translated text with latency metrics
+- **States**: Idle → Recording → Processing → Result / Error
+
+---
+
+## Architecture
 
 ```
-Start Emergency → Voice Input → Patient Summary → Hospital Selection → Navigation → Live Tracking
-```
-
-| Start Emergency | Voice Input | Patient Summary |
-|:-:|:-:|:-:|
-| Pulsating red button | Animated mic + waveform | Critical vitals grid |
-
-| Hospital Selection | Navigation | Live Tracking |
-|:-:|:-:|:-:|
-| Sorted by ETA & beds | Turn-by-turn + ETA | Countdown + progress |
-
----
-
-## ✨ Features
-
-- **Voice Input Screen** — Animated ripple microphone, live waveform visualization, transcription card
-- **Start Emergency** — Prominent pulsating emergency trigger with unit status
-- **Patient Summary** — AI-generated assessment with critical banner, vitals grid, clinical notes
-- **Hospital Selection** — Scrollable list sorted by ETA with bed availability indicators
-- **Navigation** — Full-screen map placeholder with turn-by-turn instructions and ETA overlay
-- **Live Tracking** — Real-time tracking UI with large ETA countdown and trip progress bar
-
----
-
-## 🎨 Design System
-
-The app follows the **"Clinical Sanctuary"** design philosophy from Google Stitch — prioritizing clarity, calm, and editorial efficiency for high-stress healthcare environments.
-
-### Color Palette
-
-| Token | Hex | Usage |
-|-------|-----|-------|
-| Primary | `#2563EB` | Actions, navigation, active states |
-| Background | `#F8FAFC` | App background |
-| Card | `#FFFFFF` | Card surfaces |
-| Text Primary | `#0F172A` | Headings, key data |
-| Text Secondary | `#64748B` | Descriptions, labels |
-| Critical Red | `#DC2626` | Emergency states, errors |
-| Success Green | `#16A34A` | Ready states, availability |
-| Warning | `#F59E0B` | Caution indicators |
-
-### Design Principles
-
-- **No-Line Rule** — Background color shifts instead of 1px borders
-- **Tonal Surface Hierarchy** — Multiple surface levels for depth
-- **Gradient CTAs** — 135° primary → primaryDark on action buttons
-- **Ambient Shadows** — Tinted, extra-diffused (never pure black)
-- **Glassmorphism** — Semi-transparent overlays on map screens
-
----
-
-## 🏗️ Project Structure
-
-```
-lib/
-├── main.dart                              # App entry point
-├── theme/
-│   └── app_theme.dart                     # Centralized design tokens
-├── widgets/
-│   ├── widgets.dart                       # Barrel export
-│   ├── buttons.dart                       # PrimaryButton, SecondaryButton, GhostButton
-│   ├── cards.dart                         # StatusCard, InfoTile
-│   ├── hospital_card.dart                 # HospitalCard widget
-│   └── map_placeholder.dart               # MapPlaceholder with grid + route
-└── screens/
-    ├── screens.dart                       # Barrel export
-    ├── start_emergency_screen.dart        # Screen 1: Start Emergency
-    ├── voice_input_screen.dart            # Screen 2: Voice Input (Listening)
-    ├── patient_summary_screen.dart        # Screen 3: Patient Summary
-    ├── hospital_selection_screen.dart     # Screen 4: Hospital Selection
-    ├── navigation_screen.dart             # Screen 5: Navigation
-    └── live_tracking_screen.dart          # Screen 6: Live Tracking
+emergency_app/
+├── lib/                          # Flutter Frontend
+│   ├── main.dart
+│   ├── theme/
+│   │   └── app_theme.dart            # Design tokens (colors, spacing, shadows)
+│   ├── services/
+│   │   └── translation_api_service.dart  # HTTP client for backend
+│   ├── widgets/
+│   │   ├── widgets.dart              # Barrel export
+│   │   ├── buttons.dart              # PrimaryButton, SecondaryButton, GhostButton
+│   │   ├── cards.dart                # StatusCard, InfoTile
+│   │   ├── hospital_card.dart        # HospitalCard
+│   │   └── map_placeholder.dart      # Static map with route
+│   └── screens/
+│       ├── screens.dart              # Barrel export
+│       ├── start_emergency_screen.dart
+│       ├── voice_input_screen.dart
+│       ├── voice_translation_screen.dart  # NEW — full-stack translation
+│       ├── patient_summary_screen.dart
+│       ├── hospital_selection_screen.dart
+│       ├── navigation_screen.dart
+│       └── live_tracking_screen.dart
+│
+├── backend/                      # Python FastAPI Backend
+│   ├── run.py                        # Entry point (uvicorn)
+│   ├── requirements.txt
+│   ├── .env.example                  # Config template
+│   └── app/
+│       ├── main.py                   # FastAPI app factory
+│       ├── config.py                 # Settings from .env
+│       ├── routes/
+│       │   └── transcribe.py         # POST /transcribe endpoint
+│       ├── services/
+│       │   └── openai_service.py     # Whisper + GPT async calls
+│       └── utils/
+│           ├── validation.py         # File type/size validation
+│           └── cache.py              # In-memory TTL cache
+│
+└── test/
+    └── widget_test.dart
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) (3.35+)
+- [Python](https://www.python.org/downloads/) (3.11+)
+- [OpenAI API Key](https://platform.openai.com/api-keys)
 - Chrome browser (for web) or Android device/emulator
 
-### Installation
+### 1. Backend Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/ADARSHKS-BCA/ADARSHKS-BCA-smart-ambulance-routing.git
-cd ADARSHKS-BCA-smart-ambulance-routing
+cd backend
 
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure API key
+cp .env.example .env
+# Edit .env and set your OPENAI_API_KEY
+
+# Start server
+python run.py
+```
+
+Server runs at `http://localhost:8000`  
+Swagger docs at `http://localhost:8000/docs`
+
+### 2. Flutter Setup
+
+```bash
 # Install dependencies
 flutter pub get
 
@@ -109,70 +111,94 @@ flutter run -d chrome
 flutter run -d android
 ```
 
-### Build
+---
 
-```bash
-# Build debug APK
-flutter build apk --debug
+## API Reference
 
-# Build release APK
-flutter build apk --release
+### `GET /health`
+Health check endpoint.
+
+**Response:**
+```json
+{
+  "status": "ok",
+  "service": "voice-translation-api",
+  "version": "1.0.0"
+}
 ```
 
----
+### `POST /transcribe`
+Upload an audio file for transcription and translation.
 
-## 🧩 Reusable Components
+**Request:** `multipart/form-data` with `file` field  
+**Supported formats:** `.wav`, `.mp3`, `.m4a`, `.webm`, `.ogg`, `.flac`  
+**Max size:** 25 MB
 
-| Component | Description |
-|-----------|-------------|
-| `PrimaryButton` | Gradient button with shadow and loading state |
-| `SecondaryButton` | Outlined button with tinted background |
-| `GhostButton` | Text-only button for tertiary actions |
-| `StatusCard` | Icon + label + value card for metrics |
-| `InfoTile` | Compact data tile for patient info |
-| `HospitalCard` | Full hospital info with ETA, beds, and navigate |
-| `MapPlaceholder` | Static map with grid, dashed route, and location pins |
+**Response:**
+```json
+{
+  "original": "Transcribed text in original language",
+  "translated": "English translation of the text",
+  "latency_ms": 2345,
+  "cached": false
+}
+```
 
----
-
-## 🛠️ Tech Stack
-
-- **Framework:** Flutter 3.35+
-- **Language:** Dart
-- **Design Reference:** Google Stitch (Clinical Sanctuary theme)
-- **Architecture:** Component-based with centralized theming
-- **State Management:** StatelessWidget where possible, StatefulWidget for animations
-
----
-
-## 📋 Screens Detail
-
-### 1. Start Emergency
-Large pulsating red emergency button, unit ID (AMB-742), online status, and voice-input info card.
-
-### 2. Voice Input (Listening)
-Animated ripple rings around microphone, REC indicator, audio waveform visualization, transcription card with sample text, and Retry/Confirm actions.
-
-### 3. Patient Summary
-Critical condition banner, patient demographics, 2×2 vital signs grid (Consciousness, Breathing, Pulse, Mobility), additional clinical notes, and "Send to Hospitals" action.
-
-### 4. Hospital Selection
-Scrollable list of 4 hospitals with name, address, ETA badge, distance, bed count, availability status, and navigate button.
-
-### 5. Navigation
-Full-screen map placeholder with glassmorphic top bar, ETA card with timer, turn-by-turn instruction ("Turn right in 200m"), and "Start Live Tracking" button.
-
-### 6. Live Tracking
-Full-screen map, pulsing green tracking indicator, large ETA countdown (48px), patient info chips, trip progress bar (68%), and "Arrived at Hospital" completion dialog.
+**Error codes:**
+| Code | Meaning |
+|------|---------|
+| 400 | Invalid file type or empty file |
+| 413 | File too large (>25 MB) |
+| 429 | Rate limited (30 req/min) |
+| 500 | Server error |
 
 ---
 
-## 👤 Author
+## Design System
+
+Based on the **"Clinical Sanctuary"** theme from Google Stitch.
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| Primary | `#2563EB` | Actions, navigation |
+| Background | `#F8FAFC` | App background |
+| Critical Red | `#DC2626` | Emergency states |
+| Success Green | `#16A34A` | Ready / available |
+| Warning | `#F59E0B` | Caution indicators |
+| Font | Inter | All typography |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Flutter 3.35+ / Dart |
+| Backend | Python / FastAPI |
+| Transcription | OpenAI Whisper (`gpt-4o-transcribe`) |
+| Translation | OpenAI GPT-4o-mini |
+| Caching | In-memory TTL (cachetools) |
+| Rate Limiting | slowapi |
+
+---
+
+## Backend Features
+
+- **Async processing** — All OpenAI calls use `AsyncOpenAI` for non-blocking I/O
+- **Caching** — SHA-256 content hash with 10-min TTL cache for repeated inputs
+- **Rate limiting** — 30 requests/minute per IP (configurable)
+- **File validation** — Type, size, and emptiness checks before processing
+- **Latency tracking** — Response includes `latency_ms` and `X-Process-Time-Ms` header
+- **Structured logging** — Timestamped logs with module context
+- **CORS** — Enabled for Flutter web/mobile clients
+- **Error handling** — Global exception handler with typed error responses
+
+---
+
+## Author
 
 **Adarsh KS** — BCA Student
 
----
-
-## 📄 License
+## License
 
 This project is for educational purposes.
