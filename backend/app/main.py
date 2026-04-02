@@ -32,12 +32,14 @@ async def lifespan(app: FastAPI):
     logger.info(f"   Max file size: {settings.MAX_FILE_SIZE_MB} MB")
     logger.info(f"   Allowed types: {settings.ALLOWED_EXTENSIONS}")
 
-    if not settings.OPENAI_API_KEY or settings.OPENAI_API_KEY.startswith("sk-your"):
-        logger.warning("⚠️  OPENAI_API_KEY not set! API calls will fail.")
-    else:
-        logger.info("   OpenAI key: ✓ configured")
-
+    logger.info("   Local model: 'base' (whisper)")
     logger.info("─" * 50)
+    
+    # Preload model in background thread
+    import asyncio
+    from .services.whisper_service import get_model
+    asyncio.create_task(asyncio.to_thread(get_model))
+    
     yield
     logger.info("Voice Translation API shutting down.")
 

@@ -4,16 +4,17 @@ import 'package:http/http.dart' as http;
 
 /// Service to communicate with the Voice Translation backend API.
 class TranslationApiService {
-  // Change this to your backend URL
-  // For Android emulator use: http://10.0.2.2:8000
-  // For physical device / web: use your machine's IP
-  static const String _baseUrl = 'http://localhost:8000';
+  // Permanently bypass localtunnel! The laptop's local IP address allows direct LAN connection:
+  static const String _baseUrl = 'http://192.168.1.3:8000';
 
   /// Send an audio file to the /transcribe endpoint.
   /// Returns a map with { "original", "translated", "latency_ms" }.
   static Future<Map<String, dynamic>> transcribeAudio(String filePath) async {
     final uri = Uri.parse('$_baseUrl/transcribe');
     final request = http.MultipartRequest('POST', uri);
+    
+    // Header required to bypass the the localtunnel warning screen
+    request.headers['Bypass-Tunnel-Reminder'] = 'true';
 
     if (kIsWeb) {
       // On web we get a blob URL. We need to fetch it to send bytes.
@@ -29,7 +30,7 @@ class TranslationApiService {
 
     // Set a generous timeout for large files
     final streamedResponse = await request.send().timeout(
-          const Duration(seconds: 30),
+          const Duration(seconds: 120),
         );
 
     final response = await http.Response.fromStream(streamedResponse);
@@ -50,7 +51,10 @@ class TranslationApiService {
   static Future<bool> healthCheck() async {
     try {
       final response = await http
-          .get(Uri.parse('$_baseUrl/health'))
+          .get(
+            Uri.parse('$_baseUrl/health'),
+            headers: {'Bypass-Tunnel-Reminder': 'true'},
+          )
           .timeout(const Duration(seconds: 3));
       return response.statusCode == 200;
     } catch (_) {
