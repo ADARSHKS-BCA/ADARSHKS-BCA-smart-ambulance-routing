@@ -6,7 +6,12 @@ import 'hospital_selection_screen.dart';
 /// Screen 6: Patient Summary
 /// Displays patient status, vitals, and "Send to Hospitals" action.
 class PatientSummaryScreen extends StatelessWidget {
-  const PatientSummaryScreen({super.key});
+  final String? additionalNotes;
+
+  const PatientSummaryScreen({
+    super.key,
+    this.additionalNotes,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -167,85 +172,8 @@ class PatientSummaryScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.xxl),
 
-                    // ─── Patient Info ───
-                    _SectionHeader(title: 'Patient Information'),
-                    const SizedBox(height: AppSpacing.md),
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      decoration: BoxDecoration(
-                        color: AppColors.card,
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
-                        boxShadow: AppShadows.card,
-                      ),
-                      child: Column(
-                        children: [
-                          _DataRow(label: 'Gender', value: 'Male'),
-                          _DataDivider(),
-                          _DataRow(label: 'Approx. Age', value: '~45 years'),
-                          _DataDivider(),
-                          _DataRow(
-                            label: 'Chief Complaint',
-                            value: 'Chest pain, difficulty breathing',
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xxl),
-
-                    // ─── Vitals ───
-                    _SectionHeader(title: 'Vital Signs Assessment'),
-                    const SizedBox(height: AppSpacing.md),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _VitalCard(
-                            label: 'Consciousness',
-                            value: 'Yes',
-                            detail: 'Disoriented',
-                            icon: Icons.psychology_rounded,
-                            color: AppColors.warning,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: _VitalCard(
-                            label: 'Breathing',
-                            value: 'Difficulty',
-                            detail: 'Labored',
-                            icon: Icons.air_rounded,
-                            color: AppColors.error,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _VitalCard(
-                            label: 'Pulse',
-                            value: 'Weak',
-                            detail: 'Irregular',
-                            icon: Icons.favorite_rounded,
-                            color: AppColors.error,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: _VitalCard(
-                            label: 'Mobility',
-                            value: 'Limited',
-                            detail: 'Cannot walk',
-                            icon: Icons.accessible_rounded,
-                            color: AppColors.warning,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xxl),
-
-                    // ─── Additional Notes ───
-                    _SectionHeader(title: 'Additional Notes'),
+                    // ─── Translated Assessment ───
+                    _SectionHeader(title: 'Translated Assessment'),
                     const SizedBox(height: AppSpacing.md),
                     Container(
                       width: double.infinity,
@@ -254,9 +182,11 @@ class PatientSummaryScreen extends StatelessWidget {
                         color: AppColors.surfaceContainerLow,
                         borderRadius: BorderRadius.circular(AppRadius.lg),
                       ),
-                      child: const Text(
-                        'Patient found in distress, clutching chest. Bystanders report sudden onset approximately 15 minutes ago. No known allergies mentioned. Patient is responsive to verbal commands but appears confused.',
-                        style: TextStyle(
+                      child: Text(
+                        additionalNotes?.isNotEmpty == true 
+                            ? additionalNotes! 
+                            : 'Patient found in distress, clutching chest. Bystanders report sudden onset approximately 15 minutes ago. No known allergies mentioned. Patient is responsive to verbal commands but appears confused.',
+                        style: const TextStyle(
                           fontSize: 14,
                           color: AppColors.textSecondary,
                           height: 1.6,
@@ -325,121 +255,3 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _DataRow extends StatelessWidget {
-  final String label;
-  final String value;
-  const _DataRow({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DataDivider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Divider(
-      color: AppColors.divider.withValues(alpha: 0.5),
-      height: 1,
-    );
-  }
-}
-
-class _VitalCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final String detail;
-  final IconData icon;
-  final Color color;
-
-  const _VitalCard({
-    required this.label,
-    required this.value,
-    required this.detail,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: AppShadows.card,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppRadius.sm),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            label.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textTertiary,
-              letterSpacing: 0.8,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: color,
-              letterSpacing: -0.3,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            detail,
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
