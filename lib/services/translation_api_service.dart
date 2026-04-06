@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 /// Service to communicate with the Voice Translation backend API.
 class TranslationApiService {
   // Permanently bypass localtunnel! The laptop's local IP address allows direct LAN connection:
-  static const String _baseUrl = 'http://192.168.1.3:8000';
+  static const String _baseUrl = 'http://192.168.1.2:8000';
 
   /// Send an audio file to the /transcribe endpoint.
   /// Returns a map with { "original", "translated", "latency_ms" }.
