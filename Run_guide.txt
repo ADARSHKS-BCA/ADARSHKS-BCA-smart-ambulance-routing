@@ -1,3 +1,0 @@
-Steps to run the project :
-1. Run the server : python app.py
-2. curl -X POST http://127.0.0.1:5000/api/verify-license -F "image=@C:\Users\Jasmine\Downloads\test3.jpg"
