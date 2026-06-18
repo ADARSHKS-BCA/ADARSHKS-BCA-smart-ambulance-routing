@@ -25,6 +25,7 @@ class _VoiceTranslationScreenState extends State<VoiceTranslationScreen>
   RecordingState _state = RecordingState.idle;
   String _originalText = '';
   String _translatedText = '';
+  String _detectedLanguage = '';
   String _errorMessage = '';
   int _latencyMs = 0;
 
@@ -110,6 +111,7 @@ class _VoiceTranslationScreenState extends State<VoiceTranslationScreen>
         _state = RecordingState.result;
         _originalText = result['original'] ?? '';
         _translatedText = result['translated'] ?? '';
+        _detectedLanguage = result['detected_language_name'] ?? 'Unknown';
         _latencyMs = result['latency_ms'] ?? 0;
       });
     } catch (e) {
@@ -125,6 +127,7 @@ class _VoiceTranslationScreenState extends State<VoiceTranslationScreen>
       _state = RecordingState.idle;
       _originalText = '';
       _translatedText = '';
+      _detectedLanguage = '';
       _errorMessage = '';
       _latencyMs = 0;
     });
@@ -338,32 +341,65 @@ class _VoiceTranslationScreenState extends State<VoiceTranslationScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Latency badge
-          if (_latencyMs > 0)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: AppColors.success.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppRadius.full),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.bolt_rounded,
-                      size: 14, color: AppColors.success),
-                  const SizedBox(width: 4),
-                  Text('${(_latencyMs / 1000).toStringAsFixed(1)}s',
-                      style: const TextStyle(fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.success)),
-                ],
-              ),
-            ),
+          // Status badges row
+          Row(
+            children: [
+              // Language detected badge
+              if (_detectedLanguage.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  margin: const EdgeInsets.only(bottom: AppSpacing.lg, right: AppSpacing.sm),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppRadius.full),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.language_rounded,
+                          size: 14, color: AppColors.primary),
+                      const SizedBox(width: 4),
+                      Text(
+                        _detectedLanguage == 'English'
+                            ? 'English'
+                            : '$_detectedLanguage → English',
+                        style: const TextStyle(fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary),
+                      ),
+                    ],
+                  ),
+                ),
+              // Latency badge
+              if (_latencyMs > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppRadius.full),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.bolt_rounded,
+                          size: 14, color: AppColors.success),
+                      const SizedBox(width: 4),
+                      Text('${(_latencyMs / 1000).toStringAsFixed(1)}s',
+                          style: const TextStyle(fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.success)),
+                    ],
+                  ),
+                ),
+            ],
+          ),
 
-          // Original text
+          // Original text card — labeled with the detected language
           _ResultCard(
-            label: 'ORIGINAL',
+            label: _detectedLanguage.isNotEmpty
+                ? 'ORIGINAL (${_detectedLanguage.toUpperCase()})'
+                : 'ORIGINAL',
             icon: Icons.record_voice_over_rounded,
             text: _originalText,
             color: AppColors.secondary,
@@ -377,7 +413,7 @@ class _VoiceTranslationScreenState extends State<VoiceTranslationScreen>
           ),
           const SizedBox(height: AppSpacing.lg),
 
-          // Translated text
+          // Translated text card
           _ResultCard(
             label: 'ENGLISH TRANSLATION',
             icon: Icons.translate_rounded,

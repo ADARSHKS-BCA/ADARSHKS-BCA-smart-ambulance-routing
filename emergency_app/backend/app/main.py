@@ -32,7 +32,8 @@ async def lifespan(app: FastAPI):
     logger.info(f"   Max file size: {settings.MAX_FILE_SIZE_MB} MB")
     logger.info(f"   Allowed types: {settings.ALLOWED_EXTENSIONS}")
 
-    logger.info("   Local model: 'base' (whisper)")
+    logger.info("   Engine: Faster-Whisper (CTranslate2, int8)")
+    logger.info("   Model: 'small' — multilingual")
     logger.info("─" * 50)
     
     # Preload model in background thread
@@ -47,8 +48,8 @@ async def lifespan(app: FastAPI):
 def create_app() -> FastAPI:
     app = FastAPI(
         title="Voice Translation API",
-        description="Multilingual voice-to-English translation using OpenAI Whisper + GPT",
-        version="1.0.0",
+        description="Multilingual voice-to-English translation using Faster-Whisper",
+        version="2.0.0",
         lifespan=lifespan,
     )
 

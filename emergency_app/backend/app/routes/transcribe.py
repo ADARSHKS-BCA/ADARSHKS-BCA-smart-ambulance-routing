@@ -48,14 +48,8 @@ async def transcribe(request: Request, file: UploadFile = File(...)):
             elapsed_ms = int((time.perf_counter() - start) * 1000)
             return {**cached, "latency_ms": elapsed_ms, "cached": True}
 
-        # Step 3: Run local whisper 
-        text_result = await transcribe_audio(file_bytes, filename)
-        
-        # Format the result without translation
-        result = {
-            "original": text_result,
-            "translated": text_result, # Sending the same string as requested
-        }
+        # Step 3: Run local whisper (returns dict with original, translated, detected_language)
+        result = await transcribe_audio(file_bytes, filename)
 
         # Step 4: Cache the result
         set_cached_result(file_bytes, result)
